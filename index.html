@@ -2,88 +2,563 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Arlo Website</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arlo | Ethical Hacker & Dev</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      overflow: hidden;
-      text-align: center;
+    :root {
+      --green: #00ff88;
+      --cyan: #00e5ff;
+      --red: #ff2d55;
+      --bg: #050a0e;
+      --bg2: #0a1628;
+      --text: #c8d8e8;
+      --dim: #4a6a8a;
     }
 
-    .content {
-      position: absolute;
-      top: 30%;
-      width: 100%;
-      z-index: 10;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      width: 16px; height: 16px;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s;
+      mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      width: 4px; height: 4px;
+      background: var(--green);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,136,0.015) 2px,
+        rgba(0,255,136,0.015) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    #matrix {
+      position: fixed;
+      top: 0; left: 0;
+      opacity: 0.04;
+      z-index: 0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(5,10,14,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,255,136,0.1);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--green);
+      letter-spacing: 4px;
+    }
+    .logo span { color: var(--cyan); }
+
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav a {
+      color: var(--dim);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 2px;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--green); }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 100px 20px 60px;
+      z-index: 1;
+    }
+
+    .status-bar {
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: 3px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-bar::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
     }
 
     h1 {
-      font-size: 40px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(40px, 9vw, 90px);
+      font-weight: 900;
+      color: white;
+      letter-spacing: 6px;
+      line-height: 1;
+      margin-bottom: 12px;
+      text-shadow: 0 0 40px rgba(0,255,136,0.3);
+    }
+    h1 .glitch { position: relative; color: var(--green); }
+    h1 .glitch::before, h1 .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+    }
+    h1 .glitch::before {
+      color: var(--cyan);
+      animation: glitch1 3s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    }
+    h1 .glitch::after {
+      color: var(--red);
+      animation: glitch2 3s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    }
+    @keyframes glitch1 {
+      0%, 90%, 100% { transform: translate(0); }
+      92% { transform: translate(-3px, 1px); }
+      94% { transform: translate(3px, -1px); }
+    }
+    @keyframes glitch2 {
+      0%, 90%, 100% { transform: translate(0); }
+      91% { transform: translate(3px, -1px); }
+      93% { transform: translate(-3px, 1px); }
     }
 
-    p {
-      color: #94a3b8;
+    .tagline {
+      font-size: clamp(13px, 2.5vw, 17px);
+      color: var(--dim);
+      letter-spacing: 3px;
+      margin-bottom: 40px;
     }
+    .tagline span { color: var(--cyan); }
 
-    button {
-      padding: 10px 20px;
-      background: #00ffcc;
-      border: none;
-      border-radius: 5px;
+    .terminal-box {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 20px 28px;
+      max-width: 520px;
+      text-align: left;
+      margin-bottom: 48px;
+    }
+    .terminal-header { display: flex; gap: 6px; margin-bottom: 14px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    .terminal-line { font-size: 13px; line-height: 1.8; color: var(--text); }
+    .terminal-line .prompt { color: var(--green); }
+    .terminal-line .path { color: var(--cyan); }
+    .terminal-line .output { color: var(--dim); }
+    .blink {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--green);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .cta-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      padding: 12px 28px;
+      border-radius: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 2px;
       cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--green); color: #000; border: none; }
+    .btn-primary:hover { box-shadow: 0 0 24px var(--green); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--green); border: 1px solid var(--green); }
+    .btn-outline:hover { background: rgba(0,255,136,0.08); transform: translateY(-2px); }
+
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label { font-size: 11px; letter-spacing: 4px; color: var(--green); margin-bottom: 8px; }
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      color: white;
+      letter-spacing: 3px;
+      margin-bottom: 48px;
+    }
+    h2 span { color: var(--green); }
+    .divider { width: 60px; height: 2px; background: var(--green); margin-bottom: 48px; }
+
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .skill-card {
+      background: rgba(10,22,40,0.8);
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 8px;
+      padding: 28px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--green);
+      transform: scaleY(0);
+      transition: transform 0.3s;
+    }
+    .skill-card:hover::before { transform: scaleY(1); }
+    .skill-card:hover { border-color: rgba(0,255,136,0.4); transform: translateY(-4px); }
+    .skill-icon { font-size: 28px; margin-bottom: 14px; }
+    .skill-card h3 { font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 10px; }
+    .skill-card p { font-size: 13px; color: var(--dim); line-height: 1.7; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .tag { font-size: 10px; padding: 3px 10px; border: 1px solid rgba(0,229,255,0.3); color: var(--cyan); border-radius: 20px; letter-spacing: 1px; }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .project-card {
+      background: rgba(10,22,40,0.8);
+      border: 1px solid rgba(0,255,136,0.1);
+      border-radius: 10px;
+      padding: 32px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .project-card:hover { border-color: var(--green); box-shadow: 0 0 30px rgba(0,255,136,0.08); }
+    .project-num { font-family: 'Orbitron', sans-serif; font-size: 42px; font-weight: 900; color: rgba(0,255,136,0.07); position: absolute; top: 16px; right: 24px; }
+    .project-card h3 { font-family: 'Orbitron', sans-serif; font-size: 15px; letter-spacing: 2px; color: white; margin-bottom: 12px; }
+    .project-card p { font-size: 13px; color: var(--dim); line-height: 1.8; margin-bottom: 20px; }
+    .project-status { font-size: 10px; letter-spacing: 2px; padding: 4px 12px; border-radius: 20px; display: inline-block; }
+    .status-live { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+    .status-wip { background: rgba(0,229,255,0.1); color: var(--cyan); border: 1px solid rgba(0,229,255,0.3); }
+    .status-private { background: rgba(255,45,85,0.1); color: var(--red); border: 1px solid rgba(255,45,85,0.3); }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-text p { font-size: 14px; color: var(--text); line-height: 2; margin-bottom: 16px; }
+    .about-text p .highlight { color: var(--green); }
+    .stats-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stat { background: rgba(10,22,40,0.8); border: 1px solid rgba(0,255,136,0.12); border-radius: 8px; padding: 20px; text-align: center; }
+    .stat-num { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 700; color: var(--green); }
+    .stat-label { font-size: 11px; letter-spacing: 2px; color: var(--dim); margin-top: 4px; }
+
+    .contact-center { text-align: center; max-width: 600px; margin: 0 auto; }
+    .contact-center p { font-size: 14px; color: var(--dim); line-height: 1.9; margin-bottom: 40px; }
+    .contact-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 24px;
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 6px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.05); }
+
+    footer { border-top: 1px solid rgba(0,255,136,0.08); padding: 28px 40px; text-align: center; font-size: 12px; color: var(--dim); letter-spacing: 2px; position: relative; z-index: 1; }
+    footer span { color: var(--green); }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      nav { padding: 16px 20px; }
+      section { padding: 80px 20px; }
     }
   </style>
 </head>
 <body>
 
-<div class="content">
-  <h1>Welcome Arlo 🚀</h1>
-  <p>My First 3D Website</p>
-  <button onclick="alert('Welcome 😎')">Click Me</button>
+<canvas id="matrix"></canvas>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<nav>
+  <div class="logo">AR<span>LO</span></div>
+  <ul>
+    <li><a href="#skills">SKILLS</a></li>
+    <li><a href="#projects">PROJECTS</a></li>
+    <li><a href="#about">ABOUT</a></li>
+    <li><a href="#contact">CONTACT</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="status-bar">SYSTEM ONLINE // ETHICAL HACKER</div>
+  <h1><span class="glitch" data-text="ARLO">ARLO</span></h1>
+  <p class="tagline">Developer · <span>Ethical Hacker</span> · Bot Builder</p>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <div class="dot r"></div>
+      <div class="dot y"></div>
+      <div class="dot g"></div>
+    </div>
+    <div class="terminal-line">
+      <span class="prompt">arlo@kali</span>:<span class="path">~$</span> whoami
+    </div>
+    <div class="terminal-line output">→ Ethical Hacker | WhatsApp Bot Dev | Coder</div>
+    <div class="terminal-line" style="margin-top:8px">
+      <span class="prompt">arlo@kali</span>:<span class="path">~$</span> cat mission.txt
+    </div>
+    <div class="terminal-line output">→ Break things ethically. Build tools that matter.</div>
+    <div class="terminal-line" style="margin-top:8px">
+      <span class="prompt">arlo@kali</span>:<span class="path">~$</span> <span class="blink"></span>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a href="#projects" class="btn btn-primary">VIEW PROJECTS</a>
+    <a href="#contact" class="btn btn-outline">CONTACT ME</a>
+  </div>
 </div>
 
+<section id="skills">
+  <div class="section-label reveal">// 01. ARSENAL</div>
+  <h2 class="reveal">MY <span>SKILLS</span></h2>
+  <div class="divider reveal"></div>
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">🛡️</div>
+      <h3>ETHICAL HACKING</h3>
+      <p>Penetration testing, vulnerability scanning, network analysis. Finding weaknesses before the bad guys do.</p>
+      <div class="skill-tags">
+        <span class="tag">KALI LINUX</span>
+        <span class="tag">NMAP</span>
+        <span class="tag">METASPLOIT</span>
+        <span class="tag">OSINT</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🤖</div>
+      <h3>BOT DEVELOPMENT</h3>
+      <p>Building WhatsApp bots and automation tools. Custom commands, AI integration, group management.</p>
+      <div class="skill-tags">
+        <span class="tag">WHATSAPP-WEB.JS</span>
+        <span class="tag">NODE.JS</span>
+        <span class="tag">BAILEYS</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">💻</div>
+      <h3>WEB DEVELOPMENT</h3>
+      <p>Frontend development, interactive UIs, 3D web experiences using Three.js and modern CSS.</p>
+      <div class="skill-tags">
+        <span class="tag">HTML/CSS</span>
+        <span class="tag">JAVASCRIPT</span>
+        <span class="tag">THREE.JS</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">⚙️</div>
+      <h3>SCRIPTING & TOOLS</h3>
+      <p>Writing scripts to automate tasks, custom tools, terminal utilities and system utilities.</p>
+      <div class="skill-tags">
+        <span class="tag">PYTHON</span>
+        <span class="tag">BASH</span>
+        <span class="tag">LINUX</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-label reveal">// 02. OPERATIONS</div>
+  <h2 class="reveal">MY <span>PROJECTS</span></h2>
+  <div class="divider reveal"></div>
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="project-num">01</div>
+      <h3>WHATSAPP BOT</h3>
+      <p>A feature-rich WhatsApp automation bot with custom commands, group tools, and AI integration. Built with Node.js.</p>
+      <span class="project-status status-live">● LIVE</span>
+    </div>
+    <div class="project-card reveal">
+      <div class="project-num">02</div>
+      <h3>3D PORTFOLIO SITE</h3>
+      <p>This website. A Three.js powered portfolio with custom animations, terminal UI, and matrix effects.</p>
+      <span class="project-status status-live">● LIVE</span>
+    </div>
+    <div class="project-card reveal">
+      <div class="project-num">03</div>
+      <h3>RECON TOOLKIT</h3>
+      <p>OSINT and reconnaissance scripts for ethical hacking. Automates information gathering from public sources.</p>
+      <span class="project-status status-wip">◈ IN PROGRESS</span>
+    </div>
+    <div class="project-card reveal">
+      <div class="project-num">04</div>
+      <h3>NETWORK SCANNER</h3>
+      <p>Custom network scanning tool built in Python. Maps devices, open ports, and vulnerabilities on a network.</p>
+      <span class="project-status status-private">⊘ PRIVATE</span>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-label reveal">// 03. IDENTITY</div>
+  <h2 class="reveal">ABOUT <span>ME</span></h2>
+  <div class="divider reveal"></div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>I'm <span class="highlight">Arlo</span> — a self-taught ethical hacker and developer. I started coding out of curiosity and turned it into a craft.</p>
+      <p>I build <span class="highlight">WhatsApp bots</span>, explore cybersecurity, and create web tools. My goal: understand systems deeply enough to both break and build them.</p>
+      <p>Currently sharpening skills in <span class="highlight">penetration testing</span> and expanding my bot projects with smarter AI features.</p>
+    </div>
+    <div class="stats-box reveal">
+      <div class="stat"><div class="stat-num">5+</div><div class="stat-label">PROJECTS BUILT</div></div>
+      <div class="stat"><div class="stat-num">2+</div><div class="stat-label">YEARS CODING</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">CURIOSITY</div></div>
+      <div class="stat"><div class="stat-num">0</div><div class="stat-label">BLACK HAT OPS</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-label reveal">// 04. CONNECT</div>
+  <h2 class="reveal">GET IN <span>TOUCH</span></h2>
+  <div class="divider reveal"></div>
+  <div class="contact-center reveal">
+    <p>Have a project in mind? Want to collaborate? Or just want to talk hacking and bots — reach out.</p>
+    <div class="contact-links">
+      <a href="https://github.com/arlonumber906-byte" class="contact-link" target="_blank">⬡ GITHUB</a>
+      <a href="mailto:your@email.com" class="contact-link">✉ EMAIL</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>ARLO</span> // BUILT WITH CODE & CAFFEINE // 2026
+</footer>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-
 <script>
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({
-  color: 0x00ffcc,
-  wireframe: true
+const cursor = document.getElementById('cursor');
+const dot = document.getElementById('cursorDot');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX - 8 + 'px';
+  cursor.style.top = e.clientY - 8 + 'px';
+  dot.style.left = e.clientX - 2 + 'px';
+  dot.style.top = e.clientY - 2 + 'px';
 });
 
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const cols = Math.floor(canvas.width / 16);
+const drops = Array(cols).fill(1);
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(5,10,14,0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#00ff88';
+  ctx.font = '14px Share Tech Mono';
+  drops.forEach((y, i) => {
+    const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+    ctx.fillText(char, i * 16, y * 16);
+    if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  });
+}
+setInterval(drawMatrix, 50);
 
-camera.position.z = 3;
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 80);
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
 
-// Animation
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.cssText = 'position:fixed;top:0;left:0;z-index:0;pointer-events:none;opacity:0.35;';
+document.body.appendChild(renderer.domElement);
+
+const geo = new THREE.BufferGeometry();
+const count = 200;
+const pos = new Float32Array(count * 3);
+for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 20;
+geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const particles = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x00ff88, size: 0.04 }));
+scene.add(particles);
+camera.position.z = 5;
+
 function animate() {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  particles.rotation.y += 0.0008;
+  particles.rotation.x += 0.0003;
   renderer.render(scene, camera);
 }
-
 animate();
-</script>
 
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
 </body>
 </html>
