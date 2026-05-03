@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arlo Website</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .content {
+      position: absolute;
+      top: 30%;
+      width: 100%;
+      z-index: 10;
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #00ffcc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="content">
+  <h1>Welcome Arlo 🚀</h1>
+  <p>My First 3D Website</p>
+  <button onclick="alert('Welcome 😎')">Click Me</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+<script>
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Cube
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshBasicMaterial({
+  color: 0x00ffcc,
+  wireframe: true
+});
+
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+camera.position.z = 3;
+
+// Animation
+function animate() {
+  requestAnimationFrame(animate);
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+  renderer.render(scene, camera);
+}
+
+animate();
+</script>
+
+</body>
+</html>
